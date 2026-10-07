@@ -10,6 +10,7 @@ import {
   IconCircleCheck,
   IconClock,
   IconCommand,
+  IconDownload,
   IconExternalLink,
   IconFileText,
   IconFilter,
@@ -26,6 +27,7 @@ import {
   IconSparkles,
   IconTargetArrow,
   IconUserCircle,
+  IconUpload,
   IconX,
 } from "@tabler/icons-react";
 import "./index.css";
@@ -199,6 +201,30 @@ export default function App() {
     setModal(null);
     setToast("Application marked as submitted");
   };
+  const exportData = () => {
+    const payload = JSON.stringify({ exportedAt: new Date().toISOString(), jobs, profile, settings }, null, 2);
+    const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pathway-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setToast("Workspace backup downloaded");
+  };
+  const importData = async (file) => {
+    if (!file) return;
+    try {
+      const payload = JSON.parse(await file.text());
+      if (!Array.isArray(payload.jobs) || !payload.profile) throw new Error("Invalid backup");
+      setJobs(payload.jobs);
+      setProfile(payload.profile);
+      if (payload.settings) setSettings(payload.settings);
+      setSelected(payload.jobs[0] || null);
+      setToast("Workspace backup restored");
+    } catch {
+      setToast("That backup file could not be restored");
+    }
+  };
   const nav = [
     [IconHome2, "Discover"],
     [IconInbox, "My jobs", saved],
@@ -280,7 +306,7 @@ export default function App() {
             }}
           />
         ) : page === "Settings" ? (
-          <Settings settings={settings} setSettings={setSettings} toast={setToast} />
+          <Settings settings={settings} setSettings={setSettings} toast={setToast} jobs={jobs} profile={profile} exportData={exportData} importData={importData} />
         ) : (
           <div className="content">
             <section className="welcome-row">
@@ -683,7 +709,7 @@ function Applications({ jobs, select }) {
     </div>
   );
 }
-function Settings({ settings, setSettings, toast }) {
+function Settings({ settings, setSettings, toast, jobs, profile, exportData, importData }) {
   return (
     <div className="profile-page">
       <div className="page-heading">
@@ -702,6 +728,20 @@ function Settings({ settings, setSettings, toast }) {
           <IconCheck size={17} />
           Save settings
         </button>
+      </div>
+      <div className="settings-card backup-card">
+        <div className="backup-heading">
+          <div>
+            <h2>Keep a portable copy</h2>
+            <p>Pathway stores your workspace in this browser. Export a backup before clearing site data or moving devices.</p>
+          </div>
+          <span className="backup-count">{jobs.length} roles</span>
+        </div>
+        <div className="backup-actions">
+          <button className="secondary" onClick={exportData}><IconDownload size={16} /> Export backup</button>
+          <label className="secondary file-button"><IconUpload size={16} /> Restore backup<input type="file" accept="application/json" onChange={(event) => importData(event.target.files?.[0])} /></label>
+        </div>
+        <small className="backup-footnote">Includes {profile.name}'s profile, role notes, stages and checklists.</small>
       </div>
     </div>
   );

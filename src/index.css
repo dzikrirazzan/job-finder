@@ -1419,9 +1419,50 @@ textarea:focus-visible {
   color: #69884f !important;
   margin-top: 5px !important;
 }
+.backup-card {
+  margin-top: 14px;
+}
+.backup-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.backup-count {
+  flex: none;
+  padding: 5px 7px;
+  border-radius: 4px;
+  background: #edf3df;
+  color: #5a7448;
+  font: 500 10px "DM Mono";
+}
+.backup-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.backup-actions button,
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.file-button {
+  cursor: pointer;
+}
+.file-button input {
+  display: none;
+}
+.backup-footnote {
+  display: block;
+  margin-top: 12px;
+  color: #8a9a94;
+  font-size: 10px;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
+  .backup-actions { flex-direction: column; }
 }
 
 /* Visual system: an editorial workbench for a focused job search. */
