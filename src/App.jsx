@@ -9,6 +9,7 @@ import {
   IconChevronDown,
   IconCircleCheck,
   IconClock,
+  IconCommand,
   IconExternalLink,
   IconFileText,
   IconFilter,
@@ -21,6 +22,7 @@ import {
   IconSearch,
   IconSend,
   IconSettings,
+  IconSortAscending,
   IconSparkles,
   IconTargetArrow,
   IconUserCircle,
@@ -142,7 +144,9 @@ export default function App() {
     [query, setQuery] = useState(""),
     [selected, setSelected] = useState(() => readJobs()[0] || null),
     [activeFilters, setActiveFilters] = useState([]),
+    [sortBy, setSortBy] = useState("match"),
     [filterOpen, setFilterOpen] = useState(false),
+    [commandOpen, setCommandOpen] = useState(false),
     [modal, setModal] = useState(null),
     [toast, setToast] = useState("");
   useEffect(() => store("pathway-jobs", jobs), [jobs]);
@@ -152,16 +156,30 @@ export default function App() {
     const t = setTimeout(() => setToast(""), 2600);
     return () => clearTimeout(t);
   }, [toast]);
-  const filtered = useMemo(
-    () =>
-      jobs.filter((j) => {
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen(true);
+      }
+      if (event.key === "Escape") setCommandOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+  const filtered = useMemo(() => {
+    const results = jobs.filter((j) => {
         const text = `${j.title} ${j.company} ${j.location} ${j.tags.join(" ")}`.toLowerCase();
         const queryMatch = text.includes(query.toLowerCase());
         const filterMatch = activeFilters.every((filter) => (filter === "Remote" ? j.location.toLowerCase().includes("remote") : filter === "Full-time" ? j.type === "Full-time" : text.includes("product design")));
         return queryMatch && filterMatch;
-      }),
-    [jobs, query, activeFilters],
-  );
+      });
+    return results.sort((a, b) => {
+      if (sortBy === "recent") return String(a.age).localeCompare(String(b.age));
+      if (sortBy === "salary") return String(b.salary).localeCompare(String(a.salary));
+      return b.score - a.score;
+    });
+  }, [jobs, query, activeFilters, sortBy]);
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length;
   useEffect(() => store("pathway-settings", settings), [settings]);
@@ -182,7 +200,7 @@ export default function App() {
   const nav = [
     [IconHome2, "Discover"],
     [IconInbox, "My jobs", saved],
-    [IconFileText, "Applications"],
+    [IconFileText, "Applications", jobs.filter((j) => ["Applied", "In review"].includes(j.status)).length],
     [IconUserCircle, "Profile"],
     [IconSettings, "Settings"],
   ];
@@ -233,13 +251,13 @@ export default function App() {
             </span>
             Pathway
           </div>
-          <label className="search">
+          <label className={`search ${commandOpen ? "command-search" : ""}`}>
             <IconSearch size={18} />
             <input aria-label="Search jobs" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search roles, companies, skills..." />
-            <kbd>⌘ K</kbd>
+            <kbd><IconCommand size={11} /> K</kbd>
           </label>
           <div className="top-actions">
-            <button aria-label="Notifications" className="icon-button">
+            <button aria-label="Notifications" className="icon-button" onClick={() => setToast("No new match alerts") }>
               <IconBell size={19} />
               <i />
             </button>
@@ -300,6 +318,15 @@ export default function App() {
                 >
                   Clear search <IconX size={16} />
                 </button>
+                <label className="sort-control">
+                  <IconSortAscending size={15} />
+                  <span>Sort</span>
+                  <select aria-label="Sort jobs" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                    <option value="match">Best match</option>
+                    <option value="recent">Most recent</option>
+                    <option value="salary">Salary</option>
+                  </select>
+                </label>
               </div>
             </section>
             {filterOpen && (
@@ -346,7 +373,30 @@ export default function App() {
       )}
       {modal === "lead" && <LeadModal close={() => setModal(null)} add={addLead} />} {modal === "sources" && <Sources close={() => setModal(null)} toast={setToast} />}{" "}
       {modal === "apply" && <Apply job={selected} profile={profile} close={() => setModal(null)} submit={() => applied(selected.id)} />}
+      {commandOpen && <CommandPalette close={() => setCommandOpen(false)} query={query} setQuery={setQuery} setPage={setPage} />}
     </main>
+  );
+}
+function CommandPalette({ close, query, setQuery, setPage }) {
+  const go = (nextPage) => {
+    setPage(nextPage);
+    close();
+  };
+  return (
+    <div className="command-backdrop" onMouseDown={close}>
+      <section className="command-palette" role="dialog" aria-modal="true" aria-label="Quick search" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="command-input">
+          <IconSearch size={18} />
+          <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search your workspace" />
+          <kbd>ESC</kbd>
+        </div>
+        <p>Jump to a workspace</p>
+        <button onClick={() => go("Discover")}><IconHome2 size={17} /> Discover <span>⌘ 1</span></button>
+        <button onClick={() => go("My jobs")}><IconInbox size={17} /> My jobs <span>⌘ 2</span></button>
+        <button onClick={() => go("Applications")}><IconFileText size={17} /> Applications <span>⌘ 3</span></button>
+        <button onClick={() => go("Profile")}><IconUserCircle size={17} /> Profile <span>⌘ 4</span></button>
+      </section>
+    </div>
   );
 }
 function Stat({ icon: I, number, label }) {
@@ -365,7 +415,7 @@ function Stat({ icon: I, number, label }) {
 }
 function JobRow({ job, selected, click, save }) {
   return (
-    <article className={`job-row ${selected ? "selected" : ""}`} onClick={click}>
+    <article className={`job-row ${selected ? "selected" : ""}`} onClick={click} onKeyDown={(event) => event.key === "Enter" && click()} tabIndex="0" role="button">
       <div className="company-logo">{job.company[0]}</div>
       <div className="job-main">
         <div className="job-title">
