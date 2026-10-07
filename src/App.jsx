@@ -135,6 +135,7 @@ const readJobs = () => {
   const value = readStore("pathway-jobs", seedJobs);
   return Array.isArray(value) && value.length ? value : seedJobs;
 };
+const defaultChecklist = { resume: true, portfolio: true, answers: false };
 
 export default function App() {
   const [page, setPage] = useState("Discover"),
@@ -184,6 +185,7 @@ export default function App() {
     ready = jobs.filter((j) => j.status === "Ready to apply").length;
   useEffect(() => store("pathway-settings", settings), [settings]);
   const toggleSave = (id) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, saved: !j.saved } : j)));
+  const updateJob = (id, changes) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, ...changes } : j)));
   const addLead = (lead) => {
     const job = { ...lead, id: makeId(), score: 70, saved: false, status: "New", age: "Just now", tags: ["Needs review"], note: "New lead. Add the job description to get a tailored match analysis." };
     setJobs((a) => [job, ...a]);
@@ -360,7 +362,7 @@ export default function App() {
                   </div>
                 )}
               </div>
-              {selected && <JobDetail job={jobs.find((j) => j.id === selected.id) || selected} save={() => toggleSave(selected.id)} apply={() => setModal("apply")} />}
+              {selected && <JobDetail job={jobs.find((j) => j.id === selected.id) || selected} save={() => toggleSave(selected.id)} update={(changes) => updateJob(selected.id, changes)} apply={() => setModal("apply")} />}
             </div>
           </div>
         )}
@@ -449,7 +451,8 @@ function JobRow({ job, selected, click, save }) {
     </article>
   );
 }
-function JobDetail({ job, save, apply }) {
+function JobDetail({ job, save, update, apply }) {
+  const checklist = { ...defaultChecklist, ...(job.checklist || {}) };
   return (
     <aside className="job-detail">
       <div className="detail-top">
@@ -487,6 +490,18 @@ function JobDetail({ job, save, apply }) {
           </>
         )}
       </button>
+      <div className="workflow-controls">
+        <label>
+          <span>Stage</span>
+          <select value={job.status} onChange={(event) => update({ status: event.target.value })}>
+            {["New", "Ready to apply", "Applied", "In review", "Interview", "Offer", "Closed"].map((stage) => <option key={stage}>{stage}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>Follow up</span>
+          <input type="date" value={job.followUp || ""} onChange={(event) => update({ followUp: event.target.value })} />
+        </label>
+      </div>
       {job.url ? (
         <a className="external" href={job.url} target="_blank" rel="noreferrer">
           <IconExternalLink size={16} />
@@ -525,15 +540,15 @@ function JobDetail({ job, save, apply }) {
       <section className="detail-section">
         <h3>Application checklist</h3>
         <label>
-          <input type="checkbox" defaultChecked />
+          <input type="checkbox" checked={checklist.resume} onChange={(event) => update({ checklist: { ...checklist, resume: event.target.checked } })} />
           Tailored CV ready
         </label>
         <label>
-          <input type="checkbox" defaultChecked />
+          <input type="checkbox" checked={checklist.portfolio} onChange={(event) => update({ checklist: { ...checklist, portfolio: event.target.checked } })} />
           Portfolio selected
         </label>
         <label>
-          <input type="checkbox" />
+          <input type="checkbox" checked={checklist.answers} onChange={(event) => update({ checklist: { ...checklist, answers: event.target.checked } })} />
           Review application answers
         </label>
       </section>
@@ -644,7 +659,7 @@ function Applications({ jobs, select }) {
         </div>
       </div>
       <div className="application-board">
-        {["Ready to apply", "Applied", "In review"].map((stage) => (
+        {["New", "Ready to apply", "Applied", "In review", "Interview"].map((stage) => (
           <section key={stage}>
             <h3>
               {stage}
@@ -658,8 +673,10 @@ function Applications({ jobs, select }) {
                   <strong>{j.title}</strong>
                   <small>{j.company}</small>
                   <p>{j.location}</p>
+                  {j.followUp && <small className="follow-up">Follow up {j.followUp}</small>}
                 </button>
               ))}
+            {!jobs.some((j) => j.status === stage) && <p className="column-empty">Nothing here yet</p>}
           </section>
         ))}
       </div>

@@ -1382,6 +1382,43 @@ textarea:focus-visible {
   color: #9aa7a2;
   font: 500 10px "DM Mono";
 }
+.workflow-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0 2px;
+}
+.workflow-controls label {
+  display: grid;
+  gap: 5px;
+}
+.workflow-controls label > span {
+  color: #83938e;
+  font: 500 9px "DM Mono";
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.workflow-controls select,
+.workflow-controls input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dbe5de;
+  border-radius: 5px;
+  padding: 7px;
+  background: #fbfcfa;
+  color: #35535a;
+  font: 500 10px Manrope;
+}
+.column-empty {
+  margin: 18px 4px;
+  color: #9aa9a2;
+  font-size: 10px;
+  text-align: center;
+}
+.follow-up {
+  color: #69884f !important;
+  margin-top: 5px !important;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
