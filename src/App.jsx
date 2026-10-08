@@ -584,6 +584,12 @@ function JobDetail({ job, save, update, apply }) {
 function Profile({ profile, setProfile, toast }) {
   const [editing, setEditing] = useState(false),
     [draft, setDraft] = useState(profile);
+  const change = (field, value) => setDraft({ ...draft, [field]: value });
+  const saveProfile = () => {
+    setProfile({ ...draft, skills: draft.skills.filter(Boolean), preferences: draft.preferences.filter(Boolean) });
+    setEditing(false);
+    toast("Profile updated");
+  };
   return (
     <div className="profile-page">
       <div className="page-heading">
@@ -592,7 +598,7 @@ function Profile({ profile, setProfile, toast }) {
           <h1>Everything the system uses to match you.</h1>
           <p className="lede">Keep this current. It is the source for every recommendation and application draft.</p>
         </div>
-        <button className="primary" onClick={() => (editing ? (setProfile(draft), setEditing(false), toast("Profile updated")) : setEditing(true))}>
+        <button className="primary" onClick={() => (editing ? saveProfile() : (setDraft(profile), setEditing(true)))}>
           {editing ? (
             <>
               <IconCheck size={17} />
@@ -609,12 +615,16 @@ function Profile({ profile, setProfile, toast }) {
       <div className="profile-grid">
         <section className="profile-card identity">
           <span className="profile-avatar">DR</span>
-          <div>
+          {editing ? <div className="identity-fields">
+            <input value={draft.name} onChange={(event) => change("name", event.target.value)} aria-label="Full name" />
+            <div className="inline-fields">
+              <input value={draft.role} onChange={(event) => change("role", event.target.value)} aria-label="Role" />
+              <input value={draft.location} onChange={(event) => change("location", event.target.value)} aria-label="Location" />
+            </div>
+          </div> : <div>
             <h2>{profile.name}</h2>
-            <p>
-              {profile.role} · {profile.location}
-            </p>
-          </div>
+            <p>{profile.role} · {profile.location}</p>
+          </div>}
           <span className="profile-score">
             <IconCircleCheck size={16} />
             Complete
@@ -646,17 +656,27 @@ function Profile({ profile, setProfile, toast }) {
         </section>
         <section className="profile-card">
           <h3>Application assets</h3>
-          <Asset icon={IconFileText} title={profile.resume} sub="Primary resume" />
-          <Asset icon={IconExternalLink} title={profile.portfolio} sub="Portfolio" />
+          {editing ? <div className="asset-fields">
+            <label><span>Resume filename</span><input value={draft.resume} onChange={(event) => change("resume", event.target.value)} /></label>
+            <label><span>Portfolio URL</span><input value={draft.portfolio} onChange={(event) => change("portfolio", event.target.value)} /></label>
+          </div> : <>
+            <Asset icon={IconFileText} title={profile.resume} sub="Primary resume" />
+            <Asset icon={IconExternalLink} title={profile.portfolio} sub="Portfolio" />
+          </>}
         </section>
         <section className="profile-card preference">
           <h3>Job preferences</h3>
-          {profile.preferences.map((p) => (
-            <span key={p}>
+          {(editing ? draft.preferences : profile.preferences).map((p, index) => (
+            <span key={`${p}-${index}`}>
               <IconCheck size={14} />
-              {p}
+              {editing ? <input value={p} onChange={(event) => {
+                const preferences = [...draft.preferences];
+                preferences[index] = event.target.value;
+                change("preferences", preferences);
+              }} aria-label={`Preference ${index + 1}`} /> : p}
             </span>
           ))}
+          {editing && <button className="text-button add-preference" onClick={() => change("preferences", [...draft.preferences, ""])}><IconPlus size={14} /> Add preference</button>}
         </section>
       </div>
     </div>

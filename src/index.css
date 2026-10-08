@@ -1459,10 +1459,53 @@ textarea:focus-visible {
   color: #8a9a94;
   font-size: 10px;
 }
+.identity-fields,
+.asset-fields {
+  display: grid;
+  gap: 7px;
+}
+.identity-fields input,
+.asset-fields input,
+.inline-fields input,
+.preference input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d6e1da;
+  border-radius: 5px;
+  padding: 7px 8px;
+  background: #fbfcfa;
+  color: #304b51;
+  font: 500 11px Manrope;
+}
+.inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.asset-fields label {
+  display: grid;
+  gap: 4px;
+}
+.asset-fields label > span {
+  color: #80918c;
+  font: 500 9px "DM Mono";
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.preference > span input {
+  flex: 1;
+  margin: 0;
+}
+.add-preference {
+  justify-content: flex-start;
+  padding: 4px 0;
+  font-size: 10px;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
   .backup-actions { flex-direction: column; }
+  .inline-fields { grid-template-columns: 1fr; }
 }
 
 /* Visual system: an editorial workbench for a focused job search. */
