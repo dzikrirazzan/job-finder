@@ -1501,11 +1501,96 @@ textarea:focus-visible {
   padding: 4px 0;
   font-size: 10px;
 }
+.focus-panel {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 18px;
+  margin: -17px 0 40px;
+  padding: 16px;
+  border: 1px solid #dce5d5;
+  border-radius: 7px;
+  background: #edf3df;
+}
+.focus-intro {
+  padding: 4px 3px;
+}
+.focus-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #668148;
+  font: 500 10px "DM Mono";
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.focus-intro h2 {
+  margin: 12px 0 5px;
+  color: #2b4437;
+  font-size: 17px;
+  letter-spacing: -.4px;
+}
+.focus-intro p {
+  max-width: 34ch;
+  margin: 0;
+  color: #68806c;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.focus-actions {
+  display: grid;
+  gap: 7px;
+}
+.focus-actions button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #d5e1ca;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .58);
+  color: #355443;
+  text-align: left;
+  cursor: pointer;
+}
+.focus-actions button:hover {
+  background: #fff;
+  border-color: #9fb584;
+  transform: translateY(-1px);
+}
+.focus-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: #dceac8;
+  color: #557343;
+}
+.focus-actions button > span:nth-child(2) {
+  flex: 1;
+}
+.focus-actions strong,
+.focus-actions small {
+  display: block;
+}
+.focus-actions strong {
+  font-size: 11px;
+}
+.focus-actions small {
+  margin-top: 2px;
+  color: #789078;
+  font-size: 10px;
+}
+.focus-actions button > svg {
+  color: #75916d;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
   .backup-actions { flex-direction: column; }
   .inline-fields { grid-template-columns: 1fr; }
+  .focus-panel { grid-template-columns: 1fr; margin: -2px 0 28px; }
 }
 
 /* Visual system: an editorial workbench for a focused job search. */

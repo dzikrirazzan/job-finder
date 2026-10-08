@@ -184,7 +184,11 @@ export default function App() {
     });
   }, [jobs, query, activeFilters, sortBy]);
   const saved = jobs.filter((j) => j.saved).length,
-    ready = jobs.filter((j) => j.status === "Ready to apply").length;
+    ready = jobs.filter((j) => j.status === "Ready to apply").length,
+    followUps = jobs.filter((j) => j.followUp).length,
+    dueJobs = jobs.filter((j) => j.followUp && new Date(`${j.followUp}T23:59:59`) <= new Date());
+  const profileFields = [profile.name, profile.role, profile.location, profile.about, profile.resume, profile.portfolio];
+  const profileCompletion = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
   useEffect(() => store("pathway-settings", settings), [settings]);
   const toggleSave = (id) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, saved: !j.saved } : j)));
   const updateJob = (id, changes) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, ...changes } : j)));
@@ -325,7 +329,26 @@ export default function App() {
             <section className="stats">
               <Stat icon={IconSparkles} number={`${ready} roles`} label="Ready to apply" />
               <Stat icon={IconLayoutList} number={`${saved} saved`} label="In your shortlist" />
-              <Stat icon={IconCalendar} number="3 due" label="Follow-ups this week" />
+              <Stat icon={IconCalendar} number={`${followUps} due`} label="Follow-ups planned" />
+            </section>
+            <section className="focus-panel">
+              <div className="focus-intro">
+                <span className="focus-kicker"><IconClock size={15} /> Today</span>
+                <h2>Keep the search moving</h2>
+                <p>{dueJobs.length ? `${dueJobs.length} follow-up${dueJobs.length > 1 ? "s" : ""} need your attention.` : "No follow-ups are overdue. Pick one high-fit role to move forward."}</p>
+              </div>
+              <div className="focus-actions">
+                <button onClick={() => setPage("Applications")}>
+                  <span className="focus-icon"><IconCalendar size={17} /></span>
+                  <span><strong>{dueJobs.length ? dueJobs[0].company : "Review your pipeline"}</strong><small>{dueJobs.length ? dueJobs[0].title : "Open application tracker"}</small></span>
+                  <IconArrowUpRight size={16} />
+                </button>
+                <button onClick={() => setPage("Profile")}>
+                  <span className="focus-icon"><IconUserCircle size={17} /></span>
+                  <span><strong>Profile readiness</strong><small>{profileCompletion}% of matching details filled</small></span>
+                  <IconArrowUpRight size={16} />
+                </button>
+              </div>
             </section>
             <section className="section-header">
               <div>
