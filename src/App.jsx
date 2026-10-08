@@ -304,6 +304,7 @@ export default function App() {
         ) : page === "Applications" ? (
           <Applications
             jobs={jobs}
+            updateJob={updateJob}
             select={(j) => {
               setSelected(j);
               setPage("Discover");
@@ -717,7 +718,7 @@ function Asset({ icon: I, title, sub }) {
     </div>
   );
 }
-function Applications({ jobs, select }) {
+function Applications({ jobs, select, updateJob }) {
   return (
     <div className="profile-page">
       <div className="page-heading">
@@ -737,13 +738,19 @@ function Applications({ jobs, select }) {
             {jobs
               .filter((j) => j.status === stage)
               .map((j) => (
-                <button className="application-card" onClick={() => select(j)} key={j.id}>
+                <article className="application-card" onClick={() => select(j)} onKeyDown={(event) => event.key === "Enter" && select(j)} tabIndex="0" role="button" key={j.id}>
                   <div className="company-logo">{j.company[0]}</div>
                   <strong>{j.title}</strong>
                   <small>{j.company}</small>
                   <p>{j.location}</p>
                   {j.followUp && <small className="follow-up">Follow up {j.followUp}</small>}
-                </button>
+                  <label className="card-stage" onClick={(event) => event.stopPropagation()}>
+                    <span>Move to</span>
+                    <select value={j.status} onChange={(event) => updateJob(j.id, { status: event.target.value })}>
+                      {["New", "Ready to apply", "Applied", "In review", "Interview", "Offer", "Closed"].map((option) => <option key={option}>{option}</option>)}
+                    </select>
+                  </label>
+                </article>
               ))}
             {!jobs.some((j) => j.status === stage) && <p className="column-empty">Nothing here yet</p>}
           </section>
