@@ -315,9 +315,9 @@ export default function App() {
             <kbd><IconCommand size={11} /> K</kbd>
           </label>
           <div className="top-actions">
-            <button aria-label="Notifications" className="icon-button" onClick={() => setToast("No new match alerts") }>
+            <button aria-label="Notifications" title={dueJobs.length ? `${dueJobs.length} follow-ups need attention` : "No new alerts"} className="icon-button" onClick={() => dueJobs.length ? setPage("Applications") : setToast("No new match alerts") }>
               <IconBell size={19} />
-              <i />
+              {dueJobs.length ? <i /> : null}
             </button>
             <button className="add-button" onClick={() => setModal("lead")}>
               <IconPlus size={17} />
