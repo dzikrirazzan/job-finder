@@ -961,10 +961,15 @@ function Pack({ icon: I, title, sub }) {
   );
 }
 function Modal({ title, sub, close, children }) {
+  useEffect(() => {
+    const onKeyDown = (event) => event.key === "Escape" && close();
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [close]);
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && close()}>
       <section className="modal" role="dialog" aria-modal="true" aria-label={title}>
-        <button className="modal-close" onClick={close}>
+        <button className="modal-close" onClick={close} autoFocus>
           <IconX size={20} />
         </button>
         <h2>{title}</h2>
