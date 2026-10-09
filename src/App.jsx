@@ -643,6 +643,7 @@ function JobDetail({ job, save, update, copy, apply }) {
 function Profile({ profile, setProfile, toast }) {
   const [editing, setEditing] = useState(false),
     [draft, setDraft] = useState(profile);
+  const completion = Math.round(([profile.name, profile.role, profile.location, profile.about, profile.resume, profile.portfolio].filter(Boolean).length / 6) * 100);
   const change = (field, value) => setDraft({ ...draft, [field]: value });
   const saveProfile = () => {
     setProfile({ ...draft, skills: draft.skills.filter(Boolean), preferences: draft.preferences.filter(Boolean) });
@@ -686,7 +687,7 @@ function Profile({ profile, setProfile, toast }) {
           </div>}
           <span className="profile-score">
             <IconCircleCheck size={16} />
-            Complete
+            {completion}% ready
           </span>
           <p className="about">{editing ? <textarea value={draft.about} onChange={(e) => setDraft({ ...draft, about: e.target.value })} /> : profile.about}</p>
         </section>
