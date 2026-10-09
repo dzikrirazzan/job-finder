@@ -553,6 +553,10 @@ function JobDetail({ job, save, update, copy, apply }) {
           {job.age}
         </span>
       </div>
+      <div className="detail-summary">
+        <span><small>Salary</small><strong>{job.salary || "Not listed"}</strong></span>
+        <span><small>Found via</small><strong>{job.source || "Manual lead"}</strong></span>
+      </div>
       <button className="primary wide" onClick={apply}>
         {job.status === "Applied" ? (
           <>
