@@ -10,6 +10,7 @@ import {
   IconCircleCheck,
   IconClock,
   IconCommand,
+  IconCopy,
   IconDownload,
   IconExternalLink,
   IconFileText,
@@ -236,6 +237,15 @@ export default function App() {
       setToast("That backup file could not be restored");
     }
   };
+  const copyJob = async (job) => {
+    const text = `${job.title} at ${job.company} — ${job.location}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setToast("Role details copied");
+    } catch {
+      setToast("Role details are ready to copy");
+    }
+  };
   const nav = [
     [IconHome2, "Discover"],
     [IconInbox, "My jobs", saved],
@@ -419,7 +429,7 @@ export default function App() {
                   </div>
                 )}
               </div>
-              {selected && <JobDetail job={jobs.find((j) => j.id === selected.id) || selected} save={() => toggleSave(selected.id)} update={(changes) => updateJob(selected.id, changes)} apply={() => setModal("apply")} />}
+              {selected && <JobDetail job={jobs.find((j) => j.id === selected.id) || selected} save={() => toggleSave(selected.id)} update={(changes) => updateJob(selected.id, changes)} copy={() => copyJob(selected)} apply={() => setModal("apply")} />}
             </div>
           </div>
         )}
@@ -508,7 +518,7 @@ function JobRow({ job, selected, click, save }) {
     </article>
   );
 }
-function JobDetail({ job, save, update, apply }) {
+function JobDetail({ job, save, update, copy, apply }) {
   const checklist = { ...defaultChecklist, ...(job.checklist || {}) };
   return (
     <aside className="job-detail">
@@ -570,6 +580,7 @@ function JobDetail({ job, save, update, apply }) {
           Original posting link not added
         </span>
       )}
+      <button className="copy-role" onClick={copy}><IconCopy size={15} /> Copy role details</button>
       <section className="fit-box">
         <div className="fit-head">
           <span>

@@ -1634,6 +1634,24 @@ textarea:focus-visible {
   color: #506a6b;
   font: 11px/1.5 Manrope;
 }
+.copy-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #688185;
+  font: 700 10px Manrope;
+  cursor: pointer;
+  padding: 6px;
+}
+.copy-role:hover {
+  color: var(--blue);
+  background: #f1f5f1;
+  border-radius: 5px;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
