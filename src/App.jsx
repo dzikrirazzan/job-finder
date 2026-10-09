@@ -185,7 +185,6 @@ export default function App() {
   }, [jobs, query, activeFilters, sortBy]);
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length,
-    followUps = jobs.filter((j) => j.followUp).length,
     followUpsThisWeek = jobs.filter((j) => {
       if (!j.followUp) return false;
       const date = new Date(`${j.followUp}T12:00:00`);
@@ -594,6 +593,10 @@ function JobDetail({ job, save, update, apply }) {
             Uses 3 core skills
           </span>
         </div>
+      </section>
+      <section className="detail-section">
+        <h3>Private notes</h3>
+        <textarea className="job-notes" value={job.notes || ""} onChange={(event) => update({ notes: event.target.value })} placeholder="Capture a contact, question, or reason to revisit this role." />
       </section>
       <section className="detail-section">
         <h3>Application checklist</h3>

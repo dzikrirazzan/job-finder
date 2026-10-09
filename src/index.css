@@ -1622,6 +1622,18 @@ textarea:focus-visible {
   outline: 0;
   cursor: pointer;
 }
+.job-notes {
+  width: 100%;
+  min-height: 68px;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 1px solid #dbe5de;
+  border-radius: 5px;
+  padding: 8px;
+  background: #fbfcfa;
+  color: #506a6b;
+  font: 11px/1.5 Manrope;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
