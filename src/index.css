@@ -1662,6 +1662,9 @@ textarea:focus-visible {
   border-color: #c88378;
   background: #fff8f6;
 }
+.mobile-nav {
+  display: none;
+}
 @media (max-width: 640px) {
   .sort-control span { display: none; }
   .sort-control { padding: 7px; }
@@ -1669,6 +1672,45 @@ textarea:focus-visible {
   .inline-fields { grid-template-columns: 1fr; }
   .focus-panel { grid-template-columns: 1fr; margin: -2px 0 28px; }
   .application-board { grid-template-columns: repeat(5, minmax(190px, 1fr)); }
+  .mobile-nav {
+    position: fixed;
+    z-index: 12;
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 7px 7px max(7px, env(safe-area-inset-bottom));
+    border-top: 1px solid #d8e2dc;
+    background: rgba(251, 252, 248, .96);
+    backdrop-filter: blur(10px);
+  }
+  .mobile-nav button {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    border: 0;
+    border-radius: 5px;
+    padding: 5px 2px;
+    background: transparent;
+    color: #82928d;
+    font: 600 9px Manrope;
+  }
+  .mobile-nav button.active {
+    color: var(--blue);
+    background: #edf3df;
+  }
+  .mobile-nav b {
+    position: absolute;
+    top: 0;
+    right: 22%;
+    min-width: 13px;
+    padding: 2px 3px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--ink);
+    font: 500 8px "DM Mono";
+  }
+  .content, .profile-page { padding-bottom: 86px; }
 }
 
 /* Visual system: an editorial workbench for a focused job search. */

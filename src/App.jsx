@@ -292,6 +292,15 @@ export default function App() {
           </button>
         </div>
       </aside>
+      <nav className="mobile-nav" aria-label="Mobile navigation">
+        {nav.slice(0, 4).map(([I, label, count]) => (
+          <button key={label} className={page === label ? "active" : ""} onClick={() => setPage(label)}>
+            <I size={18} />
+            <span>{label === "My jobs" ? "Saved" : label}</span>
+            {count ? <b>{count}</b> : null}
+          </button>
+        ))}
+      </nav>
       <section className="workspace">
         <header className="topbar">
           <div className="mobile-brand">
