@@ -831,7 +831,10 @@ function Toggle({ title, sub, checked, onChange }) {
 }
 function LeadModal({ close, add }) {
   const [form, setForm] = useState({ title: "", company: "", location: "", source: "Company site", type: "Full-time", salary: "Not listed", url: "", description: "" });
+  const [attempted, setAttempted] = useState(false);
   const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const validUrl = !form.url || /^https?:\/\/.+/.test(form.url);
+  const valid = form.title.trim() && form.company.trim() && form.location.trim() && validUrl;
   return (
     <Modal title="Add a job lead" sub="Paste in a role from a company site, referral, or social post." close={close}>
       <div className="form-grid">
@@ -856,7 +859,7 @@ function LeadModal({ close, add }) {
         </Field>
       </div>
       <Field label="Original posting URL">
-        <input name="url" type="url" value={form.url} onChange={change} placeholder="https://company.com/careers/..." />
+        <input name="url" type="url" value={form.url} onChange={change} placeholder="https://company.com/careers/..." aria-invalid={attempted && !validUrl} />
       </Field>
       <Field label="Job description">
         <textarea name="description" value={form.description} onChange={change} placeholder="Paste key requirements for your own review." />
@@ -865,7 +868,8 @@ function LeadModal({ close, add }) {
         <button className="secondary" onClick={close}>
           Cancel
         </button>
-        <button className="primary" disabled={!form.title || !form.company} onClick={() => add(form)}>
+        {attempted && !valid && <span className="form-error">Add a title, company, location, and a valid URL.</span>}
+        <button className="primary" onClick={() => { setAttempted(true); if (valid) add(form); }}>
           <IconPlus size={17} />
           Add lead
         </button>
