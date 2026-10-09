@@ -186,6 +186,14 @@ export default function App() {
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length,
     followUps = jobs.filter((j) => j.followUp).length,
+    followUpsThisWeek = jobs.filter((j) => {
+      if (!j.followUp) return false;
+      const date = new Date(`${j.followUp}T12:00:00`);
+      const now = new Date();
+      const weekEnd = new Date(now);
+      weekEnd.setDate(now.getDate() + (7 - now.getDay()));
+      return date >= new Date(now.setHours(0, 0, 0, 0)) && date <= weekEnd;
+    }).length,
     dueJobs = jobs.filter((j) => j.followUp && new Date(`${j.followUp}T23:59:59`) <= new Date());
   const profileFields = [profile.name, profile.role, profile.location, profile.about, profile.resume, profile.portfolio];
   const profileCompletion = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
@@ -330,7 +338,7 @@ export default function App() {
             <section className="stats">
               <Stat icon={IconSparkles} number={`${ready} roles`} label="Ready to apply" />
               <Stat icon={IconLayoutList} number={`${saved} saved`} label="In your shortlist" />
-              <Stat icon={IconCalendar} number={`${followUps} due`} label="Follow-ups planned" />
+              <Stat icon={IconCalendar} number={`${followUpsThisWeek} due`} label="Follow-ups this week" />
             </section>
             <section className="focus-panel">
               <div className="focus-intro">
