@@ -139,6 +139,13 @@ const readJobs = () => {
   return Array.isArray(value) && value.length ? value : seedJobs;
 };
 const defaultChecklist = { resume: true, portfolio: true, answers: false };
+const ageInMinutes = (age) => {
+  if (age === "Just now") return 0;
+  const match = String(age).match(/(\d+)\s*(h|d|w)/);
+  if (!match) return Number.MAX_SAFE_INTEGER;
+  const value = Number(match[1]);
+  return value * ({ h: 60, d: 1440, w: 10080 }[match[2]] || 1);
+};
 
 export default function App() {
   const [page, setPage] = useState("Discover"),
@@ -179,7 +186,7 @@ export default function App() {
         return queryMatch && filterMatch;
       });
     return results.sort((a, b) => {
-      if (sortBy === "recent") return String(a.age).localeCompare(String(b.age));
+      if (sortBy === "recent") return ageInMinutes(a.age) - ageInMinutes(b.age);
       if (sortBy === "salary") return String(b.salary).localeCompare(String(a.salary));
       return b.score - a.score;
     });
