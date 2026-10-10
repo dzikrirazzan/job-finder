@@ -772,7 +772,7 @@ function Applications({ jobs, select, updateJob }) {
         </div>
       </div>
       <div className="application-board">
-        {["New", "Ready to apply", "Applied", "In review", "Interview"].map((stage) => (
+        {["New", "Ready to apply", "Applied", "In review", "Interview", "Offer", "Closed"].map((stage) => (
           <section key={stage}>
             <h3>
               {stage}
