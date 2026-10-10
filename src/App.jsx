@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   IconArrowUpRight,
   IconBell,
@@ -148,6 +148,7 @@ const ageInMinutes = (age) => {
 };
 
 export default function App() {
+  const searchRef = useRef(null);
   const [page, setPage] = useState("Discover"),
     [jobs, setJobs] = useState(readJobs),
     [profile, setProfile] = useState(() => readStore("pathway-profile", profileDefault)),
@@ -172,6 +173,10 @@ export default function App() {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setCommandOpen(true);
+      }
+      if (event.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) {
+        event.preventDefault();
+        searchRef.current?.focus();
       }
       if (event.key === "Escape") setCommandOpen(false);
     };
@@ -318,8 +323,8 @@ export default function App() {
           </div>
           <label className={`search ${commandOpen ? "command-search" : ""}`}>
             <IconSearch size={18} />
-            <input aria-label="Search jobs" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search roles, companies, skills..." />
-            <kbd><IconCommand size={11} /> K</kbd>
+            <input ref={searchRef} aria-label="Search jobs" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search roles, companies, skills..." />
+            <kbd><IconCommand size={11} /> K /</kbd>
           </label>
           <div className="top-actions">
             <button aria-label="Notifications" title={dueJobs.length ? `${dueJobs.length} follow-ups need attention` : "No new alerts"} className="icon-button" onClick={() => dueJobs.length ? setPage("Applications") : setToast("No new match alerts") }>
