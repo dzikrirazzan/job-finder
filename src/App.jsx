@@ -4,6 +4,8 @@ import {
   IconBell,
   IconBolt,
   IconBriefcase2,
+  IconChartBar,
+  IconCheckbox,
   IconCalendar,
   IconCheck,
   IconChevronDown,
@@ -27,6 +29,7 @@ import {
   IconSortAscending,
   IconSparkles,
   IconTargetArrow,
+  IconTrash,
   IconUserCircle,
   IconUpload,
   IconX,
@@ -153,6 +156,7 @@ export default function App() {
     [jobs, setJobs] = useState(readJobs),
     [profile, setProfile] = useState(() => readStore("pathway-profile", profileDefault)),
     [settings, setSettings] = useState(() => readStore("pathway-settings", { approvalRequired: true, notifications: true })),
+    [alerts, setAlerts] = useState(() => readStore("pathway-alerts", [])),
     [query, setQuery] = useState(""),
     [selected, setSelected] = useState(() => readJobs()[0] || null),
     [activeFilters, setActiveFilters] = useState([]),
@@ -160,9 +164,12 @@ export default function App() {
     [filterOpen, setFilterOpen] = useState(false),
     [commandOpen, setCommandOpen] = useState(false),
     [modal, setModal] = useState(null),
-    [toast, setToast] = useState("");
+    [toast, setToast] = useState(""),
+    [selectedIds, setSelectedIds] = useState([]),
+    [bulkMode, setBulkMode] = useState(false);
   useEffect(() => store("pathway-jobs", jobs), [jobs]);
   useEffect(() => store("pathway-profile", profile), [profile]);
+  useEffect(() => store("pathway-alerts", alerts), [alerts]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 2600);
@@ -219,6 +226,19 @@ export default function App() {
     setModal(null);
     setToast("Job lead added to your inbox");
   };
+  const toggleSelection = (id) => setSelectedIds((ids) => ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]);
+  const applyBulk = (changes) => {
+    if (!selectedIds.length) return;
+    setJobs((all) => all.map((job) => selectedIds.includes(job.id) ? { ...job, ...changes } : job));
+    setToast(`${selectedIds.length} roles updated`);
+    setSelectedIds([]);
+    setBulkMode(false);
+  };
+  const addAlert = (alert) => {
+    setAlerts((all) => [{ ...alert, id: makeId(), createdAt: new Date().toISOString(), active: true }, ...all]);
+    setModal(null);
+    setToast("Saved search alert created");
+  };
   const applied = (id) => {
     setJobs((a) => a.map((j) => (j.id === id ? { ...j, status: "Applied", saved: true } : j)));
     setSelected((a) => ({ ...a, status: "Applied", saved: true }));
@@ -262,6 +282,7 @@ export default function App() {
     [IconHome2, "Discover"],
     [IconInbox, "My jobs", saved],
     [IconFileText, "Applications", jobs.filter((j) => ["Applied", "In review"].includes(j.status)).length],
+    [IconChartBar, "Insights"],
     [IconUserCircle, "Profile"],
     [IconSettings, "Settings"],
   ];
@@ -305,7 +326,7 @@ export default function App() {
         </div>
       </aside>
       <nav className="mobile-nav" aria-label="Mobile navigation">
-        {nav.slice(0, 4).map(([I, label, count]) => (
+        {nav.slice(0, 5).map(([I, label, count]) => (
           <button key={label} className={page === label ? "active" : ""} onClick={() => setPage(label)}>
             <I size={18} />
             <span>{label === "My jobs" ? "Saved" : label}</span>
@@ -337,7 +358,9 @@ export default function App() {
             </button>
           </div>
         </header>
-        {page === "Profile" ? (
+        {page === "Insights" ? (
+          <Insights jobs={jobs} alerts={alerts} />
+        ) : page === "Profile" ? (
           <Profile profile={profile} setProfile={setProfile} toast={setToast} />
         ) : page === "Applications" ? (
           <Applications
@@ -395,6 +418,10 @@ export default function App() {
                 <p>Ranked against your experience and preferences.</p>
               </div>
               <div className="header-actions">
+                <button className={`filter-button ${bulkMode ? "selected" : ""}`} onClick={() => { setBulkMode(!bulkMode); setSelectedIds([]); }}>
+                  <IconCheckbox size={16} /> {bulkMode ? "Done" : "Bulk select"}
+                </button>
+                <button className="filter-button" onClick={() => setModal("alert")}><IconBell size={16} /> Save search</button>
                 <button className={`filter-button ${filterOpen ? "selected" : ""}`} onClick={() => setFilterOpen(!filterOpen)}>
                   <IconFilter size={16} />
                   Filters
@@ -440,7 +467,7 @@ export default function App() {
                 {filtered
                   .filter((j) => page !== "My jobs" || j.saved)
                   .map((job) => (
-                    <JobRow key={job.id} job={job} selected={selected?.id === job.id} click={() => setSelected(job)} save={() => toggleSave(job.id)} />
+                    <JobRow key={job.id} job={job} selected={selected?.id === job.id} click={() => setSelected(job)} save={() => toggleSave(job.id)} bulkMode={bulkMode} checked={selectedIds.includes(job.id)} toggle={() => toggleSelection(job.id)} />
                   ))}
                 {!filtered.filter((j) => page !== "My jobs" || j.saved).length && (
                   <div className="empty">
@@ -452,6 +479,7 @@ export default function App() {
               </div>
               {selected && <JobDetail job={jobs.find((j) => j.id === selected.id) || selected} save={() => toggleSave(selected.id)} update={(changes) => updateJob(selected.id, changes)} copy={() => copyJob(selected)} apply={() => setModal("apply")} />}
             </div>
+            {bulkMode && <BulkBar count={selectedIds.length} apply={applyBulk} cancel={() => { setSelectedIds([]); setBulkMode(false); }} />}
           </div>
         )}
       </section>
@@ -462,6 +490,7 @@ export default function App() {
         </div>
       )}
       {modal === "lead" && <LeadModal close={() => setModal(null)} add={addLead} />} {modal === "sources" && <Sources close={() => setModal(null)} toast={setToast} />}{" "}
+      {modal === "alert" && <AlertModal close={() => setModal(null)} add={addAlert} initialQuery={query} />}
       {modal === "apply" && <Apply job={selected} profile={profile} close={() => setModal(null)} submit={() => applied(selected.id)} />}
       {commandOpen && <CommandPalette close={() => setCommandOpen(false)} query={query} setQuery={setQuery} setPage={setPage} />}
     </main>
@@ -503,9 +532,10 @@ function Stat({ icon: I, number, label }) {
     </div>
   );
 }
-function JobRow({ job, selected, click, save }) {
+function JobRow({ job, selected, click, save, bulkMode, checked, toggle }) {
   return (
     <article className={`job-row ${selected ? "selected" : ""}`} onClick={click} onKeyDown={(event) => event.key === "Enter" && click()} tabIndex="0" role="button">
+      {bulkMode && <input className="bulk-check" type="checkbox" checked={checked} onChange={(event) => { event.stopPropagation(); toggle(); }} onClick={(event) => event.stopPropagation()} aria-label={`Select ${job.title}`} />}
       <div className="company-logo">{job.company[0]}</div>
       <div className="job-main">
         <div className="job-title">
@@ -537,6 +567,45 @@ function JobRow({ job, selected, click, save }) {
         <IconHeart size={19} fill={job.saved ? "currentColor" : "none"} />
       </button>
     </article>
+  );
+}
+function BulkBar({ count, apply, cancel }) {
+  return (
+    <div className="bulk-bar">
+      <strong>{count ? `${count} selected` : "Select roles to update"}</strong>
+      <div>
+        <button disabled={!count} onClick={() => apply({ saved: true })}><IconHeart size={15} /> Save</button>
+        <button disabled={!count} onClick={() => apply({ status: "Ready to apply" })}><IconSparkles size={15} /> Ready to apply</button>
+        <button disabled={!count} onClick={() => apply({ status: "Closed" })}><IconTrash size={15} /> Archive</button>
+        <button className="bulk-cancel" onClick={cancel}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+function Insights({ jobs, alerts }) {
+  const stages = ["New", "Ready to apply", "Applied", "In review", "Interview", "Offer", "Closed"];
+  const active = jobs.filter((j) => j.status !== "Closed");
+  const avgScore = jobs.length ? Math.round(jobs.reduce((sum, job) => sum + Number(job.score || 0), 0) / jobs.length) : 0;
+  const responseRate = jobs.filter((j) => ["In review", "Interview", "Offer"].includes(j.status)).length;
+  const sources = [...new Set(jobs.map((j) => j.source || "Manual lead"))].map((source) => ({ source, count: jobs.filter((j) => (j.source || "Manual lead") === source).length }));
+  return (
+    <div className="profile-page insights-page">
+      <div className="page-heading">
+        <div><p className="eyebrow">Search intelligence</p><h1>See what is moving your search forward.</h1><p className="lede">A live read on your pipeline, focus, and the sources worth your time.</p></div>
+        <span className="insight-live"><span className="live-dot" /> Updated from {jobs.length} roles</span>
+      </div>
+      <section className="insight-metrics">
+        <div><small>Active pipeline</small><strong>{active.length}</strong><span>{jobs.length - active.length} archived</span></div>
+        <div><small>Average fit score</small><strong>{avgScore}%</strong><span>Across all captured roles</span></div>
+        <div><small>Positive response</small><strong>{responseRate}</strong><span>Roles progressed past review</span></div>
+        <div><small>Saved alerts</small><strong>{alerts.filter((alert) => alert.active).length}</strong><span>Searches watching for matches</span></div>
+      </section>
+      <section className="insight-grid">
+        <div className="insight-card funnel-card"><div className="insight-card-head"><div><p className="eyebrow">Pipeline funnel</p><h2>Where roles are landing</h2></div><IconChartBar size={18} /></div>{stages.map((stage) => { const count = jobs.filter((j) => j.status === stage).length; const width = jobs.length ? Math.max(7, Math.round((count / jobs.length) * 100)) : 7; return <div className="funnel-row" key={stage}><span>{stage}</span><div><i style={{ width: `${width}%` }} /></div><strong>{count}</strong></div>; })}</div>
+        <div className="insight-card"><div className="insight-card-head"><div><p className="eyebrow">Source mix</p><h2>Where you find signal</h2></div><IconBolt size={18} /></div><div className="source-bars">{sources.map(({ source, count }) => <div className="source-bar" key={source}><div><span>{source}</span><strong>{count}</strong></div><div><i style={{ width: `${Math.max(8, (count / Math.max(...sources.map((item) => item.count), 1)) * 100)}%` }} /></div></div>)}{!sources.length && <p className="column-empty">Add roles to see source performance.</p>}</div></div>
+      </section>
+      <section className="insight-card next-move"><div><p className="eyebrow">Recommended next move</p><h2>{active.filter((j) => j.status === "Ready to apply").length ? "Convert your highest-fit ready roles" : "Keep your top-of-funnel full"}</h2><p>{active.filter((j) => j.status === "Ready to apply").length ? "You have roles that already cleared your first review. Move one into an application while the context is fresh." : "Add or save a few promising roles so the system can compare opportunities with more confidence."}</p></div><span className="next-move-number">{active.filter((j) => j.status === "Ready to apply").length || jobs.filter((j) => j.status === "New").length}</span></section>
+    </div>
   );
 }
 function JobDetail({ job, save, update, copy, apply }) {
@@ -902,6 +971,11 @@ function LeadModal({ close, add }) {
       </div>
     </Modal>
   );
+}
+function AlertModal({ close, add, initialQuery }) {
+  const [form, setForm] = useState({ name: initialQuery ? `${initialQuery} roles` : "Product design roles", query: initialQuery, cadence: "Daily" });
+  const change = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  return <Modal title="Save a search alert" sub="Pathway will keep this rule in your workspace so you can revisit it during your next scan." close={close}><Field label="Alert name"><input name="name" value={form.name} onChange={change} autoFocus /></Field><Field label="Search terms"><input name="query" value={form.query} onChange={change} placeholder="e.g. product designer remote" /></Field><Field label="Check cadence"><select name="cadence" value={form.cadence} onChange={change}><option>Daily</option><option>Weekly</option><option>When a high-fit role appears</option></select></Field><div className="modal-actions"><button className="secondary" onClick={close}>Cancel</button><button className="primary" onClick={() => form.name.trim() && add(form)}><IconBell size={16} /> Save alert</button></div></Modal>;
 }
 function Sources({ close, toast }) {
   return (
