@@ -890,7 +890,20 @@ function Applications({ jobs, select, updateJob }) {
             {jobs
               .filter((j) => j.status === stage)
               .map((j) => (
-                <article className="application-card" onClick={() => select(j)} onKeyDown={(event) => event.key === "Enter" && select(j)} tabIndex="0" role="button" key={j.id}>
+                <article
+                  className="application-card"
+                  onClick={() => select(j)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      select(j);
+                    }
+                  }}
+                  tabIndex="0"
+                  role="button"
+                  aria-label={`${j.title} at ${j.company}, ${stage}`}
+                  key={j.id}
+                >
                   <div className="company-logo">{j.company[0]}</div>
                   <strong>{j.title}</strong>
                   <small>{j.company}</small>
@@ -1108,7 +1121,7 @@ function Modal({ title, sub, close, children }) {
   return (
     <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && close()}>
       <section className="modal" role="dialog" aria-modal="true" aria-label={title}>
-        <button className="modal-close" onClick={close} autoFocus>
+        <button className="modal-close" onClick={close} autoFocus aria-label="Close dialog">
           <IconX size={20} />
         </button>
         <h2>{title}</h2>
