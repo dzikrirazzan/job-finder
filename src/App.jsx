@@ -149,6 +149,18 @@ const ageInMinutes = (age) => {
   const value = Number(match[1]);
   return value * ({ h: 60, d: 1440, w: 10080 }[match[2]] || 1);
 };
+const normalizeBackupJobs = (jobs) => jobs.map((job) => {
+  if (!job || typeof job !== "object" || typeof job.title !== "string" || typeof job.company !== "string" || !job.title.trim() || !job.company.trim()) throw new Error("Invalid job record");
+  return {
+    ...job,
+    id: job.id ?? makeId(),
+    tags: Array.isArray(job.tags) ? job.tags : [],
+    score: Number.isFinite(Number(job.score)) ? Number(job.score) : 0,
+    saved: Boolean(job.saved),
+    status: job.status || "New",
+    age: job.age || "Imported",
+  };
+});
 
 export default function App() {
   const searchRef = useRef(null);
@@ -253,7 +265,7 @@ export default function App() {
     setToast("Application marked as submitted");
   };
   const exportData = () => {
-    const payload = JSON.stringify({ exportedAt: new Date().toISOString(), jobs, profile, settings }, null, 2);
+    const payload = JSON.stringify({ exportedAt: new Date().toISOString(), jobs, profile, settings, alerts }, null, 2);
     const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
@@ -266,11 +278,13 @@ export default function App() {
     if (!file) return;
     try {
       const payload = JSON.parse(await file.text());
-      if (!Array.isArray(payload.jobs) || !payload.profile) throw new Error("Invalid backup");
-      setJobs(payload.jobs);
+      if (!payload || typeof payload !== "object" || !Array.isArray(payload.jobs) || !payload.profile || typeof payload.profile !== "object") throw new Error("Invalid backup");
+      const restoredJobs = normalizeBackupJobs(payload.jobs);
+      setJobs(restoredJobs);
       setProfile(payload.profile);
       if (payload.settings) setSettings(payload.settings);
-      setSelected(payload.jobs[0] || null);
+      if (Array.isArray(payload.alerts)) setAlerts(payload.alerts);
+      setSelected(restoredJobs[0] || null);
       setToast("Workspace backup restored");
     } catch {
       setToast("That backup file could not be restored");
