@@ -171,6 +171,12 @@ export default function App() {
   useEffect(() => store("pathway-profile", profile), [profile]);
   useEffect(() => store("pathway-alerts", alerts), [alerts]);
   useEffect(() => {
+    setSelected((current) => {
+      if (!current) return jobs[0] || null;
+      return jobs.find((job) => job.id === current.id) || jobs[0] || null;
+    });
+  }, [jobs]);
+  useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 2600);
     return () => clearTimeout(t);
@@ -222,6 +228,7 @@ export default function App() {
     dueJobs = jobs.filter((j) => j.followUp && new Date(`${j.followUp}T23:59:59`) <= new Date());
   const profileFields = [profile.name, profile.role, profile.location, profile.about, profile.resume, profile.portfolio];
   const profileCompletion = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
+  const selectedJob = selected ? jobs.find((job) => job.id === selected.id) || null : null;
   useEffect(() => store("pathway-settings", settings), [settings]);
   const toggleSave = (id) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, saved: !j.saved } : j)));
   const updateJob = (id, changes) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, ...changes } : j)));
@@ -483,7 +490,7 @@ export default function App() {
                   </div>
                 )}
               </div>
-              {selected && <JobDetail job={jobs.find((j) => j.id === selected.id) || selected} save={() => toggleSave(selected.id)} update={(changes) => updateJob(selected.id, changes)} copy={() => copyJob(selected)} apply={() => setModal("apply")} />}
+              {selectedJob && <JobDetail job={selectedJob} save={() => toggleSave(selectedJob.id)} update={(changes) => updateJob(selectedJob.id, changes)} copy={() => copyJob(selectedJob)} apply={() => setModal("apply")} />}
             </div>
             {bulkMode && <BulkBar count={selectedIds.length} apply={applyBulk} cancel={() => { setSelectedIds([]); setBulkMode(false); }} />}
           </div>
@@ -497,7 +504,7 @@ export default function App() {
       )}
       {modal === "lead" && <LeadModal close={() => setModal(null)} add={addLead} />} {modal === "sources" && <Sources close={() => setModal(null)} toast={setToast} />}{" "}
       {modal === "alert" && <AlertModal close={() => setModal(null)} add={addAlert} initialQuery={query} />}
-      {modal === "apply" && <Apply job={selected} profile={profile} close={() => setModal(null)} submit={() => applied(selected.id)} />}
+      {modal === "apply" && selectedJob && <Apply job={selectedJob} profile={profile} close={() => setModal(null)} submit={() => applied(selectedJob.id)} />}
       {commandOpen && <CommandPalette close={() => setCommandOpen(false)} query={query} setQuery={setQuery} setPage={setPage} />}
     </main>
   );
