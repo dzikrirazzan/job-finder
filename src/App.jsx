@@ -192,9 +192,15 @@ export default function App() {
   }, []);
   const filtered = useMemo(() => {
     const results = jobs.filter((j) => {
-        const text = `${j.title} ${j.company} ${j.location} ${j.tags.join(" ")}`.toLowerCase();
-        const queryMatch = text.includes(query.toLowerCase());
-        const filterMatch = activeFilters.every((filter) => (filter === "Remote" ? j.location.toLowerCase().includes("remote") : filter === "Full-time" ? j.type === "Full-time" : text.includes("product design")));
+        const text = `${j.title} ${j.company} ${j.location} ${j.type} ${j.source} ${j.salary} ${j.status} ${j.tags.join(" ")} ${j.note}`.toLowerCase();
+        const normalizedQuery = query.trim().toLowerCase();
+        const queryMatch = !normalizedQuery || text.includes(normalizedQuery);
+        const isDesignRole = /design|ux|ui/.test(`${j.title} ${j.tags.join(" ")}`.toLowerCase());
+        const filterMatch = activeFilters.every((filter) => (
+          filter === "Remote" ? j.location.toLowerCase().includes("remote") :
+          filter === "Full-time" ? j.type === "Full-time" :
+          isDesignRole
+        ));
         return queryMatch && filterMatch;
       });
     return results.sort((a, b) => {
