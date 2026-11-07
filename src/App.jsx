@@ -171,12 +171,6 @@ export default function App() {
   useEffect(() => store("pathway-profile", profile), [profile]);
   useEffect(() => store("pathway-alerts", alerts), [alerts]);
   useEffect(() => {
-    setSelected((current) => {
-      if (!current) return jobs[0] || null;
-      return jobs.find((job) => job.id === current.id) || jobs[0] || null;
-    });
-  }, [jobs]);
-  useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 2600);
     return () => clearTimeout(t);
