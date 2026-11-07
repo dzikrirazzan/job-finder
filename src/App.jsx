@@ -534,7 +534,20 @@ function Stat({ icon: I, number, label }) {
 }
 function JobRow({ job, selected, click, save, bulkMode, checked, toggle }) {
   return (
-    <article className={`job-row ${selected ? "selected" : ""}`} onClick={click} onKeyDown={(event) => event.key === "Enter" && click()} tabIndex="0" role="button">
+    <article
+      className={`job-row ${selected ? "selected" : ""}`}
+      onClick={click}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          click();
+        }
+      }}
+      tabIndex="0"
+      role="button"
+      aria-pressed={selected}
+      aria-label={`${job.title} at ${job.company}`}
+    >
       {bulkMode && <input className="bulk-check" type="checkbox" checked={checked} onChange={(event) => { event.stopPropagation(); toggle(); }} onClick={(event) => event.stopPropagation()} aria-label={`Select ${job.title}`} />}
       <div className="company-logo">{job.company[0]}</div>
       <div className="job-main">
@@ -557,7 +570,8 @@ function JobRow({ job, selected, click, save, bulkMode, checked, toggle }) {
         <small>match</small>
       </div>
       <button
-        aria-label="Save job"
+        aria-label={job.saved ? `Remove ${job.title} from saved jobs` : `Save ${job.title}`}
+        title={job.saved ? "Remove from saved jobs" : "Save job"}
         className={`heart ${job.saved ? "saved" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
