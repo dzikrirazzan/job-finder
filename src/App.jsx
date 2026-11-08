@@ -149,6 +149,7 @@ const readJobs = () => {
   return Array.isArray(value) && value.length ? value : seedJobs;
 };
 const defaultChecklist = { resume: true, portfolio: true, answers: false };
+const defaultView = { activeFilters: [], sortBy: "match" };
 const ageInMinutes = (age) => {
   if (age === "Just now") return 0;
   const match = String(age).match(/(\d+)\s*(h|d|w)/);
@@ -178,8 +179,8 @@ export default function App() {
     [alerts, setAlerts] = useState(() => readStore("pathway-alerts", [])),
     [query, setQuery] = useState(""),
     [selected, setSelected] = useState(() => readJobs()[0] || null),
-    [activeFilters, setActiveFilters] = useState([]),
-    [sortBy, setSortBy] = useState("match"),
+    [activeFilters, setActiveFilters] = useState(() => readStore("pathway-view", defaultView).activeFilters || []),
+    [sortBy, setSortBy] = useState(() => readStore("pathway-view", defaultView).sortBy || "match"),
     [filterOpen, setFilterOpen] = useState(false),
     [commandOpen, setCommandOpen] = useState(false),
     [modal, setModal] = useState(null),
@@ -189,6 +190,7 @@ export default function App() {
   useEffect(() => store("pathway-jobs", jobs), [jobs]);
   useEffect(() => store("pathway-profile", profile), [profile]);
   useEffect(() => store("pathway-alerts", alerts), [alerts]);
+  useEffect(() => store("pathway-view", { activeFilters, sortBy }), [activeFilters, sortBy]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 2600);
