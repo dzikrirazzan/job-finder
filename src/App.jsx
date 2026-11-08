@@ -228,6 +228,7 @@ export default function App() {
       return b.score - a.score;
     });
   }, [jobs, query, activeFilters, sortBy]);
+  const visibleJobs = filtered.filter((j) => page !== "My jobs" || j.saved);
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length,
     followUpsThisWeek = jobs.filter((j) => {
@@ -492,12 +493,13 @@ export default function App() {
             )}
             <div className="jobs-layout">
               <div className="job-list">
-                {filtered
-                  .filter((j) => page !== "My jobs" || j.saved)
-                  .map((job) => (
+                <div className="results-count" aria-live="polite">
+                  {visibleJobs.length} {visibleJobs.length === 1 ? "role" : "roles"} shown
+                </div>
+                {visibleJobs.map((job) => (
                     <JobRow key={job.id} job={job} selected={selected?.id === job.id} click={() => setSelected(job)} save={() => toggleSave(job.id)} bulkMode={bulkMode} checked={selectedIds.includes(job.id)} toggle={() => toggleSelection(job.id)} />
                   ))}
-                {!filtered.filter((j) => page !== "My jobs" || j.saved).length && (
+                {!visibleJobs.length && (
                   <div className="empty">
                     <IconSearch size={26} />
                     <h3>No matching roles</h3>

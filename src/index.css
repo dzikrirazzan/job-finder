@@ -9,6 +9,13 @@
   background: #d8f0c4;
   color: #315c3a;
 }
+.results-count {
+  color: #8b9b96;
+  font: 500 10px "DM Mono";
+  margin: 0 0 9px 2px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
 .external.muted {
   color: #8b9b96;
   cursor: default;
