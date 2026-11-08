@@ -10,6 +10,14 @@ Pathway is a focused job-search workspace for collecting roles, comparing fit, s
 - Edit the matching profile, see daily follow-up actions, and use the mobile navigation.
 - Export and restore a complete JSON backup from Settings.
 
+## Useful shortcuts
+
+- Press `/` to focus the job search field.
+- Press `Cmd/Ctrl + K` to open the workspace command palette.
+- Press `Esc` to close an open modal or command palette.
+
+Search filters and sort preferences are remembered in the browser alongside jobs, profile data, alerts, and settings. Use Settings → **Export backup** to create a portable JSON copy of that workspace state.
+
 ## Local development
 
 ```bash
