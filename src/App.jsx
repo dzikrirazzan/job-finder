@@ -791,19 +791,12 @@ function Profile({ profile, setProfile, toast }) {
           <h1>Everything the system uses to match you.</h1>
           <p className="lede">Keep this current. It is the source for every recommendation and application draft.</p>
         </div>
-        <button className="primary" onClick={() => (editing ? saveProfile() : (setDraft(profile), setEditing(true)))}>
-          {editing ? (
-            <>
-              <IconCheck size={17} />
-              Save profile
-            </>
-          ) : (
-            <>
-              <IconFileText size={17} />
-              Edit profile
-            </>
-          )}
-        </button>
+        <div className="profile-actions">
+          {editing && <button className="text-button" onClick={() => { setDraft(profile); setEditing(false); }}>Cancel</button>}
+          <button className="primary" onClick={() => (editing ? saveProfile() : (setDraft(profile), setEditing(true)))}>
+            {editing ? <><IconCheck size={17} />Save profile</> : <><IconFileText size={17} />Edit profile</>}
+          </button>
+        </div>
       </div>
       <div className="profile-grid">
         <section className="profile-card identity">

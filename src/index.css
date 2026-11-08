@@ -260,6 +260,11 @@ textarea:focus-visible {
   margin: 0 auto;
   padding: 40px 42px 64px;
 }
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 .welcome-row,
 .page-heading {
   display: flex;
