@@ -249,6 +249,12 @@ export default function App() {
   const toggleSave = (id) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, saved: !j.saved } : j)));
   const updateJob = (id, changes) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, ...changes } : j)));
   const addLead = (lead) => {
+    const key = `${lead.title} ${lead.company}`.trim().toLowerCase();
+    const duplicate = jobs.some((job) => `${job.title} ${job.company}`.trim().toLowerCase() === key);
+    if (duplicate) {
+      setToast("That role is already in your workspace");
+      return;
+    }
     const job = { ...lead, id: makeId(), score: 70, saved: false, status: "New", age: "Just now", tags: ["Needs review"], note: "New lead. Add the job description to get a tailored match analysis." };
     setJobs((a) => [job, ...a]);
     setSelected(job);
