@@ -137,6 +137,13 @@ const store = (key, value) => {
   } catch {}
 };
 const makeId = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const initials = (name) => String(name || "Pathway")
+  .trim()
+  .split(/\s+/)
+  .slice(0, 2)
+  .map((part) => part[0])
+  .join("")
+  .toUpperCase();
 const readJobs = () => {
   const value = readStore("pathway-jobs", seedJobs);
   return Array.isArray(value) && value.length ? value : seedJobs;
@@ -337,7 +344,7 @@ export default function App() {
             <IconChevronDown size={16} />
           </button>
           <button className="profile-chip" onClick={() => setPage("Profile")}>
-            <span className="avatar">DR</span>
+            <span className="avatar">{initials(profile.name)}</span>
             <span>
               <strong>{profile.name}</strong>
               <small>{profile.role}</small>
@@ -790,7 +797,7 @@ function Profile({ profile, setProfile, toast }) {
       </div>
       <div className="profile-grid">
         <section className="profile-card identity">
-          <span className="profile-avatar">DR</span>
+          <span className="profile-avatar">{initials(profile.name)}</span>
           {editing ? <div className="identity-fields">
             <input value={draft.name} onChange={(event) => change("name", event.target.value)} aria-label="Full name" />
             <div className="inline-fields">
