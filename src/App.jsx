@@ -213,6 +213,12 @@ export default function App() {
         event.preventDefault();
         setCommandOpen(true);
       }
+      if ((event.metaKey || event.ctrlKey) && /^[1-4]$/.test(event.key)) {
+        event.preventDefault();
+        const shortcutPages = ["Discover", "My jobs", "Applications", "Profile"];
+        setPage(shortcutPages[Number(event.key) - 1]);
+        setCommandOpen(false);
+      }
       if (event.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) {
         event.preventDefault();
         searchRef.current?.focus();
@@ -556,10 +562,10 @@ function CommandPalette({ close, query, setQuery, setPage }) {
           <kbd>ESC</kbd>
         </div>
         <p>Jump to a workspace</p>
-        <button onClick={() => go("Discover")}><IconHome2 size={17} /> Discover <span>⌘ 1</span></button>
-        <button onClick={() => go("My jobs")}><IconInbox size={17} /> My jobs <span>⌘ 2</span></button>
-        <button onClick={() => go("Applications")}><IconFileText size={17} /> Applications <span>⌘ 3</span></button>
-        <button onClick={() => go("Profile")}><IconUserCircle size={17} /> Profile <span>⌘ 4</span></button>
+        <button onClick={() => go("Discover")}><IconHome2 size={17} /> Discover <span>⌘/Ctrl 1</span></button>
+        <button onClick={() => go("My jobs")}><IconInbox size={17} /> My jobs <span>⌘/Ctrl 2</span></button>
+        <button onClick={() => go("Applications")}><IconFileText size={17} /> Applications <span>⌘/Ctrl 3</span></button>
+        <button onClick={() => go("Profile")}><IconUserCircle size={17} /> Profile <span>⌘/Ctrl 4</span></button>
       </section>
     </div>
   );
