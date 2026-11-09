@@ -157,6 +157,17 @@ const ageInMinutes = (age) => {
   const value = Number(match[1]);
   return value * ({ h: 60, d: 1440, w: 10080 }[match[2]] || 1);
 };
+const startOfToday = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+const endOfThisWeek = () => {
+  const end = startOfToday();
+  end.setDate(end.getDate() + (7 - end.getDay()));
+  end.setHours(23, 59, 59, 999);
+  return end;
+};
 const normalizeBackupJobs = (jobs) => jobs.map((job) => {
   if (!job || typeof job !== "object" || typeof job.title !== "string" || typeof job.company !== "string" || !job.title.trim() || !job.company.trim()) throw new Error("Invalid job record");
   return {
@@ -236,10 +247,7 @@ export default function App() {
     followUpsThisWeek = jobs.filter((j) => {
       if (!j.followUp) return false;
       const date = new Date(`${j.followUp}T12:00:00`);
-      const now = new Date();
-      const weekEnd = new Date(now);
-      weekEnd.setDate(now.getDate() + (7 - now.getDay()));
-      return date >= new Date(now.setHours(0, 0, 0, 0)) && date <= weekEnd;
+      return date >= startOfToday() && date <= endOfThisWeek();
     }).length,
     dueJobs = jobs.filter((j) => j.followUp && new Date(`${j.followUp}T23:59:59`) <= new Date());
   const profileFields = [profile.name, profile.role, profile.location, profile.about, profile.resume, profile.portfolio];
