@@ -284,6 +284,14 @@ export default function App() {
     setSelectedIds([]);
     setBulkMode(false);
   };
+  const toggleVisibleSelection = () => {
+    const visibleIds = visibleJobs.map((job) => job.id);
+    const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+    setSelectedIds((ids) => allVisibleSelected
+      ? ids.filter((id) => !visibleIds.includes(id))
+      : [...new Set([...ids, ...visibleIds])]);
+  };
+  const allVisibleSelected = visibleJobs.length > 0 && visibleJobs.every((job) => selectedIds.includes(job.id));
   const addAlert = (alert) => {
     setAlerts((all) => [{ ...alert, id: makeId(), createdAt: new Date().toISOString(), active: true }, ...all]);
     setModal(null);
@@ -473,6 +481,11 @@ export default function App() {
                 <button className={`filter-button ${bulkMode ? "selected" : ""}`} onClick={() => { setBulkMode(!bulkMode); setSelectedIds([]); }}>
                   <IconCheckbox size={16} /> {bulkMode ? "Done" : "Bulk select"}
                 </button>
+                {bulkMode && (
+                  <button className="filter-button" onClick={toggleVisibleSelection} disabled={!visibleJobs.length}>
+                    <IconCheckbox size={16} /> {allVisibleSelected ? "Clear visible" : "Select visible"}
+                  </button>
+                )}
                 <button className="filter-button" onClick={() => setModal("alert")}><IconBell size={16} /> Save search</button>
                 <button className={`filter-button ${filterOpen ? "selected" : ""}`} onClick={() => setFilterOpen(!filterOpen)}>
                   <IconFilter size={16} />
