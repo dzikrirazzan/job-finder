@@ -150,6 +150,7 @@ const readJobs = () => {
 };
 const defaultChecklist = { resume: true, portfolio: true, answers: false };
 const defaultView = { activeFilters: [], sortBy: "match" };
+const applicationStatuses = ["Applied", "In review", "Interview", "Offer"];
 const ageInMinutes = (age) => {
   if (age === "Just now") return 0;
   const match = String(age).match(/(\d+)\s*(h|d|w)/);
@@ -332,7 +333,7 @@ export default function App() {
   const nav = [
     [IconHome2, "Discover"],
     [IconInbox, "My jobs", saved],
-    [IconFileText, "Applications", jobs.filter((j) => ["Applied", "In review"].includes(j.status)).length],
+    [IconFileText, "Applications", jobs.filter((j) => applicationStatuses.includes(j.status)).length],
     [IconChartBar, "Insights"],
     [IconUserCircle, "Profile"],
     [IconSettings, "Settings"],
