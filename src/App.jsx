@@ -791,6 +791,12 @@ function JobDetail({ job, save, update, copy, apply }) {
           </span>
         </div>
       </section>
+      {job.description && (
+        <section className="detail-section">
+          <h3>Job description</h3>
+          <p className="job-description">{job.description}</p>
+        </section>
+      )}
       <section className="detail-section">
         <h3>Private notes</h3>
         <textarea className="job-notes" value={job.notes || ""} onChange={(event) => update({ notes: event.target.value })} placeholder="Capture a contact, question, or reason to revisit this role." />

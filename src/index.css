@@ -20,6 +20,13 @@
   color: #8b9b96;
   cursor: default;
 }
+.job-description {
+  color: #71847f;
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-line;
+}
 .modal {
   max-height: calc(100dvh - 40px);
   overflow: auto;
