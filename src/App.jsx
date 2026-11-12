@@ -231,7 +231,7 @@ export default function App() {
   }, []);
   const filtered = useMemo(() => {
     const results = jobs.filter((j) => {
-        const text = `${j.title} ${j.company} ${j.location} ${j.type} ${j.source} ${j.salary} ${j.status} ${j.tags.join(" ")} ${j.note}`.toLowerCase();
+        const text = `${j.title} ${j.company} ${j.location} ${j.type} ${j.source} ${j.salary} ${j.status} ${j.tags.join(" ")} ${j.note} ${j.description || ""}`.toLowerCase();
         const normalizedQuery = query.trim().toLowerCase();
         const queryMatch = !normalizedQuery || text.includes(normalizedQuery);
         const isDesignRole = /design|ux|ui/.test(`${j.title} ${j.tags.join(" ")}`.toLowerCase());
