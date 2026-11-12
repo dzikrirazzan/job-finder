@@ -1010,7 +1010,7 @@ function Settings({ settings, setSettings, toast, jobs, profile, exportData, imp
         </div>
         <div className="backup-actions">
           <button className="secondary" onClick={exportData}><IconDownload size={16} /> Export backup</button>
-          <label className="secondary file-button"><IconUpload size={16} /> Restore backup<input type="file" accept="application/json" onChange={(event) => importData(event.target.files?.[0])} /></label>
+          <label className="secondary file-button"><IconUpload size={16} /> Restore backup<input type="file" accept="application/json" onChange={(event) => { importData(event.target.files?.[0]); event.target.value = ""; }} /></label>
         </div>
         <small className="backup-footnote">Includes {profile.name}'s profile, role notes, stages and checklists.</small>
       </div>
