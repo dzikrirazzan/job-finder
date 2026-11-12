@@ -187,6 +187,12 @@ const normalizeBackupJobs = (jobs) => jobs.map((job) => {
     age: job.age || "Imported",
   };
 });
+const normalizeProfile = (profile) => ({
+  ...profileDefault,
+  ...profile,
+  skills: Array.isArray(profile.skills) ? profile.skills : profileDefault.skills,
+  preferences: Array.isArray(profile.preferences) ? profile.preferences : profileDefault.preferences,
+});
 
 export default function App() {
   const searchRef = useRef(null);
@@ -326,7 +332,7 @@ export default function App() {
       if (!payload || typeof payload !== "object" || !Array.isArray(payload.jobs) || !payload.profile || typeof payload.profile !== "object") throw new Error("Invalid backup");
       const restoredJobs = normalizeBackupJobs(payload.jobs);
       setJobs(restoredJobs);
-      setProfile(payload.profile);
+      setProfile(normalizeProfile(payload.profile));
       if (payload.settings) setSettings(payload.settings);
       if (Array.isArray(payload.alerts)) setAlerts(payload.alerts);
       setSelected(restoredJobs[0] || null);
