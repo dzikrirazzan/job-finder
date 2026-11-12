@@ -377,7 +377,7 @@ export default function App() {
             </span>
             <span>
               <strong>Sources connected</strong>
-              <small>4 alerts are active</small>
+            <small>{alerts.filter((alert) => alert.active).length} alerts are active</small>
             </span>
             <IconChevronDown size={16} />
           </button>
