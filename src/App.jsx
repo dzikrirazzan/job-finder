@@ -158,6 +158,12 @@ const ageInMinutes = (age) => {
   const value = Number(match[1]);
   return value * ({ h: 60, d: 1440, w: 10080 }[match[2]] || 1);
 };
+const salaryValue = (salary) => {
+  const match = String(salary || "").replaceAll(",", "").match(/(\d+(?:\.\d+)?)\s*(k|m)?/i);
+  if (!match) return 0;
+  const multiplier = match[2]?.toLowerCase() === "m" ? 1000000 : match[2] ? 1000 : 1;
+  return Number(match[1]) * multiplier;
+};
 const startOfToday = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -244,7 +250,7 @@ export default function App() {
       });
     return results.sort((a, b) => {
       if (sortBy === "recent") return ageInMinutes(a.age) - ageInMinutes(b.age);
-      if (sortBy === "salary") return String(b.salary).localeCompare(String(a.salary));
+      if (sortBy === "salary") return salaryValue(b.salary) - salaryValue(a.salary);
       return b.score - a.score;
     });
   }, [jobs, query, activeFilters, sortBy]);
