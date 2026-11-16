@@ -176,18 +176,24 @@ const endOfThisWeek = () => {
   return end;
 };
 const isFollowUpOverdue = (followUp) => followUp && new Date(`${followUp}T23:59:59`) <= new Date();
-const normalizeBackupJobs = (jobs) => jobs.map((job) => {
-  if (!job || typeof job !== "object" || typeof job.title !== "string" || typeof job.company !== "string" || !job.title.trim() || !job.company.trim()) throw new Error("Invalid job record");
-  return {
-    ...job,
-    id: job.id ?? makeId(),
-    tags: Array.isArray(job.tags) ? job.tags : [],
-    score: Number.isFinite(Number(job.score)) ? Number(job.score) : 0,
-    saved: Boolean(job.saved),
-    status: job.status || "New",
-    age: job.age || "Imported",
-  };
-});
+const normalizeBackupJobs = (jobs) => {
+  const usedIds = new Set();
+  return jobs.map((job) => {
+    if (!job || typeof job !== "object" || typeof job.title !== "string" || typeof job.company !== "string" || !job.title.trim() || !job.company.trim()) throw new Error("Invalid job record");
+    const candidateId = job.id ?? makeId();
+    const id = usedIds.has(candidateId) ? makeId() : candidateId;
+    usedIds.add(id);
+    return {
+      ...job,
+      id,
+      tags: Array.isArray(job.tags) ? job.tags : [],
+      score: Number.isFinite(Number(job.score)) ? Number(job.score) : 0,
+      saved: Boolean(job.saved),
+      status: job.status || "New",
+      age: job.age || "Imported",
+    };
+  });
+};
 const normalizeProfile = (profile) => ({
   ...profileDefault,
   ...profile,
