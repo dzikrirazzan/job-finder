@@ -20,6 +20,10 @@
   color: #8b9b96;
   cursor: default;
 }
+.follow-up.overdue {
+  color: #b75c52;
+  font-weight: 700;
+}
 .job-description {
   color: #71847f;
   font-size: 11px;

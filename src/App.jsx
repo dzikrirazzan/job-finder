@@ -175,6 +175,7 @@ const endOfThisWeek = () => {
   end.setHours(23, 59, 59, 999);
   return end;
 };
+const isFollowUpOverdue = (followUp) => followUp && new Date(`${followUp}T23:59:59`) <= new Date();
 const normalizeBackupJobs = (jobs) => jobs.map((job) => {
   if (!job || typeof job !== "object" || typeof job.title !== "string" || typeof job.company !== "string" || !job.title.trim() || !job.company.trim()) throw new Error("Invalid job record");
   return {
@@ -977,7 +978,7 @@ function Applications({ jobs, select, updateJob }) {
                   <strong>{j.title}</strong>
                   <small>{j.company}</small>
                   <p>{j.location}</p>
-                  {j.followUp && <small className="follow-up">Follow up {j.followUp}</small>}
+                  {j.followUp && <small className={`follow-up ${isFollowUpOverdue(j.followUp) ? "overdue" : ""}`}>{isFollowUpOverdue(j.followUp) ? "Overdue" : "Follow up"} {j.followUp}</small>}
                   <label className="card-stage" onClick={(event) => event.stopPropagation()}>
                     <span>Move to</span>
                     <select value={j.status} onChange={(event) => updateJob(j.id, { status: event.target.value })}>
