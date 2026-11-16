@@ -4,7 +4,8 @@ Pathway is a focused job-search workspace for collecting roles, comparing fit, s
 
 ## What is included
 
-- Search, sort, filter, save, and triage job leads with a keyboard command palette.
+- Search, sort, filter by role type or application stage, save, and triage job leads with a keyboard command palette.
+- Compare salary context directly from the results list before opening a role.
 - Move roles through New, Ready to apply, Applied, In review, Interview, Offer, and Closed.
 - Keep private notes, checklists, follow-up dates, source links, and salary context per role.
 - Edit the matching profile, see daily follow-up actions, and use the mobile navigation.
@@ -16,7 +17,7 @@ Pathway is a focused job-search workspace for collecting roles, comparing fit, s
 - Press `Cmd/Ctrl + K` to open the workspace command palette.
 - Press `Esc` to close an open modal or command palette.
 
-Search filters and sort preferences are remembered in the browser alongside jobs, profile data, alerts, and settings. Use Settings → **Export backup** to create a portable JSON copy of that workspace state.
+Search filters, stage filters, and sort preferences are remembered in the browser alongside jobs, profile data, alerts, and settings. Use Settings → **Export backup** to create a portable JSON copy of that workspace state.
 
 ## Local development
 
