@@ -149,7 +149,7 @@ const readJobs = () => {
   return Array.isArray(value) && value.length ? value : seedJobs;
 };
 const defaultChecklist = { resume: true, portfolio: true, answers: false };
-const defaultView = { activeFilters: [], sortBy: "match" };
+const defaultView = { activeFilters: [], sortBy: "match", stageFilter: "All" };
 const applicationStatuses = ["Applied", "In review", "Interview", "Offer"];
 const ageInMinutes = (age) => {
   if (age === "Just now") return 0;
@@ -205,6 +205,7 @@ export default function App() {
     [selected, setSelected] = useState(() => readJobs()[0] || null),
     [activeFilters, setActiveFilters] = useState(() => readStore("pathway-view", defaultView).activeFilters || []),
     [sortBy, setSortBy] = useState(() => readStore("pathway-view", defaultView).sortBy || "match"),
+    [stageFilter, setStageFilter] = useState(() => readStore("pathway-view", defaultView).stageFilter || "All"),
     [filterOpen, setFilterOpen] = useState(false),
     [commandOpen, setCommandOpen] = useState(false),
     [modal, setModal] = useState(null),
@@ -214,7 +215,7 @@ export default function App() {
   useEffect(() => store("pathway-jobs", jobs), [jobs]);
   useEffect(() => store("pathway-profile", profile), [profile]);
   useEffect(() => store("pathway-alerts", alerts), [alerts]);
-  useEffect(() => store("pathway-view", { activeFilters, sortBy }), [activeFilters, sortBy]);
+  useEffect(() => store("pathway-view", { activeFilters, sortBy, stageFilter }), [activeFilters, sortBy, stageFilter]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 2600);
@@ -252,14 +253,14 @@ export default function App() {
           filter === "Full-time" ? j.type === "Full-time" :
           isDesignRole
         ));
-        return queryMatch && filterMatch;
+        return queryMatch && filterMatch && (stageFilter === "All" || j.status === stageFilter);
       });
     return results.sort((a, b) => {
       if (sortBy === "recent") return ageInMinutes(a.age) - ageInMinutes(b.age);
       if (sortBy === "salary") return salaryValue(b.salary) - salaryValue(a.salary);
       return b.score - a.score;
     });
-  }, [jobs, query, activeFilters, sortBy]);
+  }, [jobs, query, activeFilters, sortBy, stageFilter]);
   const visibleJobs = filtered.filter((j) => page !== "My jobs" || j.saved);
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length,
@@ -508,6 +509,7 @@ export default function App() {
                   onClick={() => {
                     setQuery("");
                     setActiveFilters([]);
+                    setStageFilter("All");
                   }}
                 >
                   Clear search <IconX size={16} />
@@ -519,6 +521,13 @@ export default function App() {
                     <option value="match">Best match</option>
                     <option value="recent">Most recent</option>
                     <option value="salary">Salary</option>
+                  </select>
+                </label>
+                <label className="sort-control">
+                  <span>Stage</span>
+                  <select aria-label="Filter jobs by stage" value={stageFilter} onChange={(event) => setStageFilter(event.target.value)}>
+                    <option>All</option>
+                    {applicationStatuses.concat(["New", "Ready to apply", "Closed"]).filter((stage, index, stages) => stages.indexOf(stage) === index).map((stage) => <option key={stage}>{stage}</option>)}
                   </select>
                 </label>
               </div>
