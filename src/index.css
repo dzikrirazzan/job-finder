@@ -31,6 +31,10 @@
   margin: 0;
   white-space: pre-line;
 }
+.job-salary {
+  color: #557c42;
+  font-weight: 700;
+}
 .modal {
   max-height: calc(100dvh - 40px);
   overflow: auto;

@@ -654,7 +654,7 @@ function JobRow({ job, selected, click, save, bulkMode, checked, toggle }) {
           <span className={job.status.toLowerCase().replaceAll(" ", "-")}>{job.status}</span>
         </div>
         <p>
-          {job.company} <span>·</span> {job.location} <span>·</span> {job.type}
+          {job.company} <span>·</span> {job.location} <span>·</span> {job.type} <span>·</span> <b className="job-salary">{job.salary || "Salary not listed"}</b>
         </p>
         <div className="tags">
           {job.tags.slice(0, 2).map((t) => (
