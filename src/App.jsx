@@ -262,6 +262,10 @@ export default function App() {
     });
   }, [jobs, query, activeFilters, sortBy, stageFilter]);
   const visibleJobs = filtered.filter((j) => page !== "My jobs" || j.saved);
+  useEffect(() => {
+    if (selected && visibleJobs.some((job) => job.id === selected.id)) return;
+    setSelected(visibleJobs[0] || null);
+  }, [page, visibleJobs, selected]);
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length,
     followUpsThisWeek = jobs.filter((j) => {
