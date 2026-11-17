@@ -568,6 +568,11 @@ export default function App() {
                     <IconSearch size={26} />
                     <h3>No matching roles</h3>
                     <p>Try a different search or add a job lead.</p>
+                    {(query || activeFilters.length || stageFilter !== "All") && (
+                      <button className="secondary" onClick={() => { setQuery(""); setActiveFilters([]); setStageFilter("All"); }}>
+                        Clear filters
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
