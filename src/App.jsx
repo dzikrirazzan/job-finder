@@ -137,6 +137,15 @@ const store = (key, value) => {
   } catch {}
 };
 const makeId = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const safeUrl = (value) => {
+  if (!value) return "";
+  try {
+    const url = new URL(value);
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
+  } catch {
+    return "";
+  }
+};
 const initials = (name) => String(name || "Pathway")
   .trim()
   .split(/\s+/)
@@ -191,6 +200,7 @@ const normalizeBackupJobs = (jobs) => {
       saved: Boolean(job.saved),
       status: job.status || "New",
       age: job.age || "Imported",
+      url: safeUrl(job.url),
     };
   });
 };
@@ -290,7 +300,7 @@ export default function App() {
       setToast("That role is already in your workspace");
       return;
     }
-    const job = { ...lead, id: makeId(), score: 70, saved: false, status: "New", age: "Just now", tags: ["Needs review"], note: "New lead. Add the job description to get a tailored match analysis." };
+    const job = { ...lead, url: safeUrl(lead.url), id: makeId(), score: 70, saved: false, status: "New", age: "Just now", tags: ["Needs review"], note: "New lead. Add the job description to get a tailored match analysis." };
     setJobs((a) => [job, ...a]);
     setSelected(job);
     setModal(null);
