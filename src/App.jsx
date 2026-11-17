@@ -215,7 +215,7 @@ export default function App() {
   const searchRef = useRef(null);
   const [page, setPage] = useState("Discover"),
     [jobs, setJobs] = useState(readJobs),
-    [profile, setProfile] = useState(() => readStore("pathway-profile", profileDefault)),
+    [profile, setProfile] = useState(() => normalizeProfile(readStore("pathway-profile", profileDefault))),
     [settings, setSettings] = useState(() => readStore("pathway-settings", { approvalRequired: true, notifications: true })),
     [alerts, setAlerts] = useState(() => readStore("pathway-alerts", [])),
     [query, setQuery] = useState(""),
