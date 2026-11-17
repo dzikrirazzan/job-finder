@@ -159,6 +159,14 @@ const readJobs = () => {
 };
 const defaultChecklist = { resume: true, portfolio: true, answers: false };
 const defaultView = { activeFilters: [], sortBy: "match", stageFilter: "All" };
+const readView = () => {
+  const value = readStore("pathway-view", defaultView);
+  return {
+    ...defaultView,
+    ...value,
+    activeFilters: Array.isArray(value?.activeFilters) ? value.activeFilters : defaultView.activeFilters,
+  };
+};
 const applicationStatuses = ["Applied", "In review", "Interview", "Offer"];
 const ageInMinutes = (age) => {
   if (age === "Just now") return 0;
@@ -220,9 +228,9 @@ export default function App() {
     [alerts, setAlerts] = useState(() => readStore("pathway-alerts", [])),
     [query, setQuery] = useState(""),
     [selected, setSelected] = useState(() => readJobs()[0] || null),
-    [activeFilters, setActiveFilters] = useState(() => readStore("pathway-view", defaultView).activeFilters || []),
-    [sortBy, setSortBy] = useState(() => readStore("pathway-view", defaultView).sortBy || "match"),
-    [stageFilter, setStageFilter] = useState(() => readStore("pathway-view", defaultView).stageFilter || "All"),
+    [activeFilters, setActiveFilters] = useState(() => readView().activeFilters),
+    [sortBy, setSortBy] = useState(() => readView().sortBy),
+    [stageFilter, setStageFilter] = useState(() => readView().stageFilter),
     [filterOpen, setFilterOpen] = useState(false),
     [commandOpen, setCommandOpen] = useState(false),
     [modal, setModal] = useState(null),
