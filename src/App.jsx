@@ -269,10 +269,7 @@ export default function App() {
     });
   }, [jobs, query, activeFilters, sortBy, stageFilter]);
   const visibleJobs = filtered.filter((j) => page !== "My jobs" || j.saved);
-  useEffect(() => {
-    if (selected && visibleJobs.some((job) => job.id === selected.id)) return;
-    setSelected(visibleJobs[0] || null);
-  }, [page, visibleJobs, selected]);
+  const selectedJob = visibleJobs.find((job) => job.id === selected?.id) || visibleJobs[0] || null;
   const saved = jobs.filter((j) => j.saved).length,
     ready = jobs.filter((j) => j.status === "Ready to apply").length,
     followUpsThisWeek = jobs.filter((j) => {
@@ -283,7 +280,6 @@ export default function App() {
     dueJobs = jobs.filter((j) => j.followUp && new Date(`${j.followUp}T23:59:59`) <= new Date());
   const profileFields = [profile.name, profile.role, profile.location, profile.about, profile.resume, profile.portfolio];
   const profileCompletion = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
-  const selectedJob = selected ? jobs.find((job) => job.id === selected.id) || null : null;
   useEffect(() => store("pathway-settings", settings), [settings]);
   const toggleSave = (id) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, saved: !j.saved } : j)));
   const updateJob = (id, changes) => setJobs((a) => a.map((j) => (j.id === id ? { ...j, ...changes } : j)));
@@ -565,7 +561,7 @@ export default function App() {
                   {visibleJobs.length} {visibleJobs.length === 1 ? "role" : "roles"} shown
                 </div>
                 {visibleJobs.map((job) => (
-                    <JobRow key={job.id} job={job} selected={selected?.id === job.id} click={() => setSelected(job)} save={() => toggleSave(job.id)} bulkMode={bulkMode} checked={selectedIds.includes(job.id)} toggle={() => toggleSelection(job.id)} />
+                    <JobRow key={job.id} job={job} selected={selectedJob?.id === job.id} click={() => setSelected(job)} save={() => toggleSave(job.id)} bulkMode={bulkMode} checked={selectedIds.includes(job.id)} toggle={() => toggleSelection(job.id)} />
                   ))}
                 {!visibleJobs.length && (
                   <div className="empty">
